@@ -16,7 +16,7 @@ $(FRONTEND):
 
 all: test
 
-test: test.js test.6502
+test: test.js test.6502 test.lua test.go
 
 test.js: gosling.js.out
 	$(DIFF) gosling.js.out gosling.js.gold
@@ -30,7 +30,19 @@ test.6502: gosling.6502.out
 gosling.6502.out: gosling.aastory $(AAMBOX) $(FRONTEND)
 	$(AAMBOX) -s 1234 $(FRONTEND) gosling.aastory <gosling.in >gosling.6502.out
 
+test.lua: gosling.lua.out
+	$(DIFF) gosling.lua.out gosling.lua.gold
+
+gosling.lua.out: gosling.aastory
+	luajit ../../src/lua/frontend.lua -s 1234 gosling.aastory <gosling.in >gosling.lua.out
+
+test.go: gosling.go.out
+	$(DIFF) gosling.go.out gosling.go.gold
+
+gosling.go.out: gosling.aastory
+	../../src/go/aamrun -s 1234 gosling.aastory <gosling.in >gosling.go.out
+
 clean:
 	rm -f *.out
 
-.PHONY: all test test.js test.6502 clean
+.PHONY: all test test.js test.6502 test.lua test.go clean
